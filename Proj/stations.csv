@@ -1,0 +1,17 @@
+station_id,location_name,city,latitude,longitude,charger_type,country
+ST-100,Downtown Metro,New York,40.7128,-74.006,DC Fast,
+ST-101,Westside Mall,Los Angeles,34.0522,-118.2437,Level 2,
+ST-102,Tech Park,San Francisco,37.7749,-122.4194,DC Fast,
+ST-103,Airport Hub,Chicago,41.8781,-87.6298,DC Fast,
+ST-104,Suburban Plaza,Austin,30.2672,-97.7431,Level 2,
+ST-79689,Guindy,Chennai,0.0,0.0,DC Fast,
+ST-105,Mumbai Central,Mumbai,India,19.076,72.8777,Level 2
+ST-106,Delhi Metro,Delhi,India,28.7041,77.1025,Level 2
+ST-107,Bangalore Tech Park,Bangalore,India,12.9716,77.5946,Level 2
+ST-108,Kolkata Hub,Kolkata,India,22.5726,88.3639,Level 2
+ST-109,Hyderabad Airport,Hyderabad,India,17.385,78.4867,DC Fast
+ST-110,Downtown Metro,New York,USA,40.7128,-74.006,Level 2
+ST-111,Westside Mall,Los Angeles,USA,34.0522,-118.2437,Level 2
+ST-112,Tech Park,San Francisco,USA,37.7749,-122.4194,DC Fast
+ST-113,Airport Hub,Chicago,USA,41.8781,-87.6298,DC Fast
+ST-114,Suburban Plaza,Austin,USA,30.2672,-97.7431,Level 2
