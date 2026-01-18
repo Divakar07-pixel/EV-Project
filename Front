@@ -1,0 +1,105 @@
+import sqlite3
+import tkinter as tk
+from tkinter import messagebox
+from datetime import datetime
+
+# Connect to SQLite database (creates it if it doesn't exist)
+conn = sqlite3.connect('ev_charging.db')
+cursor = conn.cursor()
+
+# Create tables if they don't exist (SQL queries)
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS charging_stations (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        location TEXT NOT NULL
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS bookings (
+        id INTEGER PRIMARY KEY,
+        customer_name TEXT NOT NULL,
+        vehicle_model TEXT NOT NULL,
+        charging_time TEXT NOT NULL,
+        station_id INTEGER NOT NULL,
+        FOREIGN KEY (station_id) REFERENCES charging_stations (id)
+    )
+''')
+
+# Add some sample stations (for demo purposes)
+cursor.execute("INSERT OR IGNORE INTO charging_stations (id, name, location) VALUES (1, 'Station A', 'New Delhi Center')")
+cursor.execute("INSERT OR IGNORE INTO charging_stations (id, name, location) VALUES (2, 'Station B', 'Gurgaon Highway')")
+cursor.execute("INSERT OR IGNORE INTO charging_stations (id, name, location) VALUES (3, 'Station C', 'Mumbai Central')")
+cursor.execute("INSERT OR IGNORE INTO charging_stations (id, name, location) VALUES (4, 'Station D', 'Bangalore Tech Park')")
+cursor.execute("INSERT OR IGNORE INTO charging_stations (id, name, location) VALUES (5, 'Station E', 'Chennai Marina')")
+conn.commit()
+
+# Add some sample bookings (for demo purposes)
+cursor.execute("INSERT OR IGNORE INTO bookings (customer_name, vehicle_model, charging_time, station_id) VALUES ('John Doe', 'Tesla Model 3', '2026-01-20 10:00', 1)")
+cursor.execute("INSERT OR IGNORE INTO bookings (customer_name, vehicle_model, charging_time, station_id) VALUES ('Jane Smith', 'Nissan Leaf', '2026-01-21 14:30', 2)")
+cursor.execute("INSERT OR IGNORE INTO bookings (customer_name, vehicle_model, charging_time, station_id) VALUES ('Bob Johnson', 'BMW i3', '2026-01-22 09:15', 3)")
+conn.commit()
+
+# Function to check if a slot is available (SQL query)
+def is_slot_available(station_id, charging_time):
+    cursor.execute("SELECT * FROM bookings WHERE station_id = ? AND charging_time = ?", (station_id, charging_time))
+    return cursor.fetchone() is None  # Returns True if no booking exists for that time/station
+
+# Function to book a slot (SQL insert query)
+def book_slot(customer_name, vehicle_model, charging_time, station_id):
+    if is_slot_available(station_id, charging_time):
+        cursor.execute("INSERT INTO bookings (customer_name, vehicle_model, charging_time, station_id) VALUES (?, ?, ?, ?)",
+                       (customer_name, vehicle_model, charging_time, station_id))
+        conn.commit()
+        return True
+    return False
+
+# Tkinter GUI setup
+root = tk.Tk()
+root.title("EV Charging Booking System")
+root.geometry("400x300")
+
+# Labels and inputs
+tk.Label(root, text="Customer Name:").pack()
+name_entry = tk.Entry(root)
+name_entry.pack()
+
+tk.Label(root, text="Vehicle Model:").pack()
+vehicle_entry = tk.Entry(root)
+vehicle_entry.pack()
+
+tk.Label(root, text="Charging Time (YYYY-MM-DD HH:MM):").pack()
+time_entry = tk.Entry(root)
+time_entry.pack()
+
+tk.Label(root, text="Station (1 for A, 2 for B):").pack()
+station_entry = tk.Entry(root)
+station_entry.pack()
+
+# Booking button
+def handle_booking():
+    name = name_entry.get()
+    vehicle = vehicle_entry.get()
+    time_str = time_entry.get()
+    station = station_entry.get()
+    
+    try:
+        station_id = int(station)
+        # Validate time format
+        datetime.strptime(time_str, "%Y-%m-%d %H:%M")
+        
+        if book_slot(name, vehicle, time_str, station_id):
+            messagebox.showinfo("Success", "Booking confirmed!")
+        else:
+            messagebox.showerror("Error", "Slot already booked. Try another time.")
+    except ValueError:
+        messagebox.showerror("Error", "Invalid input. Check time format or station ID.")
+
+tk.Button(root, text="Book Charging Slot", command=handle_booking).pack(pady=20)
+
+# Run the GUI
+root.mainloop()
+
+# Close database connection when done
+conn.close()
